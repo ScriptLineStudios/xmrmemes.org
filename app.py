@@ -177,7 +177,7 @@ def meme(meme_id):
     # account = wallet.accounts[account_index]
     # meme["tips"] = float(sum(transaction.amount for transaction in account.incoming()))
     # db.save()
-    return render_template("meme.html", meme=meme, tip_address=meme.get("address"), amount=meme.get("tips_formatted"))
+    return render_template("meme.html", meme=meme, tip_address=meme.get("address"), amount=meme.get("tips_formatted"), user=session.get("display_name"))
 
 @app.route("/register_account", methods=["POST"])
 def register_account():
