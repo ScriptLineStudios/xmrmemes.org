@@ -8,32 +8,36 @@ from monero.wallet import Wallet
 import threading
 import time
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 
 lock = threading.Lock()
 
 def update_tips(db, lock, wallet):
-    while True:
-        with lock:
-            for meme in db.data.get("memes"):
-                account_index = meme["account_index"]
-                account = wallet.accounts[account_index]
-                meme["tips"] = float(sum(transaction.amount for transaction in account.incoming())) 
-                meme["tips_formatted"] = format(meme["tips"], '.8f')
-            for name in db.data.get("users").get("names"):
-                account = db.data.get("users").get("accounts").get(name)
-                account["total_tips"] = float(sum((sum(transaction.amount for transaction in wallet.accounts[i].incoming()) for i in account.get("accounts"))))
-                account["total_tips_formatted"] = format(account["total_tips"], '.8f')
+    with lock:
+        for meme in db.data.get("memes"):
+            account_index = meme["account_index"]
+            account = wallet.accounts[account_index]
+            meme["tips"] = float(sum(transaction.amount for transaction in account.incoming())) 
+            meme["tips_formatted"] = format(meme["tips"], '.8f')
+        for name in db.data.get("users").get("names"):
+            account = db.data.get("users").get("accounts").get(name)
+            account["total_tips"] = float(sum((sum(transaction.amount for transaction in wallet.accounts[i].incoming()) for i in account.get("accounts"))))
+            account["total_tips_formatted"] = format(account["total_tips"], '.8f')
 
-            db.data["sorted_accounts"] = list(sorted(db.data.get("users").get("accounts"), key=lambda user: db.data.get("users").get("accounts").get(user).get("total_tips_formatted"), reverse=True))
-            db.data["formatted_view"] = {acc: db.data.get("users").get("accounts").get(acc).get("total_tips_formatted") for acc in db.data["sorted_accounts"]}
+        db.data["sorted_accounts"] = list(sorted(db.data.get("users").get("accounts"), key=lambda user: db.data.get("users").get("accounts").get(user).get("total_tips_formatted"), reverse=True))
+        db.data["formatted_view"] = {acc: db.data.get("users").get("accounts").get(acc).get("total_tips_formatted") for acc in db.data["sorted_accounts"]}
 
-            db.save()
-
-        time.sleep(30)
+        db.save()
 
 app = Flask(__name__)
 db = Database('db.json')
 wallet = Wallet(JSONRPCWallet(host=os.environ["WALLET_RPC_IP"], port=28088))
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=update_tips, trigger="interval", seconds=30, args=(db, lock, wallet))
+scheduler.start()
+atexit.register(scheduler.shutdown)
 
 if not db.data.get("users"):
     db.data["users"] = {
@@ -120,8 +124,10 @@ def submit_meme():
             "filename": filename,
             "account_index": account.index,
             "address": str(account.address()),
-            "tips": 0.0
+            "tips": 0.0,
+            "tips_formatted": format(0.0, '.8f')
         })
+
         db.data["users"]["accounts"][session.get("display_name")].get("accounts").append(account.index) #this account belongs to the session owner.
         db.save()
     return redirect(url_for("index"))
@@ -220,5 +226,5 @@ def register_account():
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    threading.Thread(target=update_tips, args=(db, lock, wallet)).start()
+    # threading.Thread(target=update_tips, args=(db, lock, wallet)).start()
     app.run(host="0.0.0.0", debug=False)
