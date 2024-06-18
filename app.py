@@ -140,7 +140,7 @@ def account():
     display_name = session.get("display_name")
     account = db.data.get("users").get("accounts").get(display_name)
     account_balance = sum(wallet.accounts[i].balance(unlocked=True) for i in account.get("accounts"))
-    return render_template("account.html", memes=list(filter(lambda e: e.get("author")==display_name, db.data.get("memes"))), user=session.get("display_name"), display_name=display_name, account_balance=float(account_balance), address=account.get("address"))
+    return render_template("account.html", memes=list(filter(lambda e: e.get("author")==display_name, db.data.get("memes"))), user=session.get("display_name"), display_name=display_name, account_balance=format(float(account_balance), '.8f'), address=account.get("address"))
 
 @app.route("/account_view/<display_name>")
 def account_view(display_name):
