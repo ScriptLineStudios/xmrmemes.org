@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<html>
+    <body>
+        <div class="banner_small">
+            <!-- <div class="banner_small_button"> -->
+                <!-- <img width="40" src="https://cryptologos.cc/logos/monero-xmr-logo.png"> -->
+            <!-- </div> -->
+            <div class="banner_small_button">
+                <a href="/">
+                    Home
+                </a>
+            </div>
+            <div class="banner_small_button">
+                <a href="/about">
+                    About
+                </a>
+            </div>
+            <div class="banner_small_button">
+                <a href="/leaderboard">
+                    Leaderboard
+                </a>
+            </div>
+            <div class="banner_small_button">
+                <a href="/submit">
+                    Submit
+                </a>
+            </div>  
+
+            {% if not user %}
+                <div class="banner_small_button">
+                    <a href="/login">
+                        Login
+                    </a>
+                </div>  
+                <div class="banner_small_button">
+                    <a href="/register">
+                        Register
+                    </a>
+                </div>  
+                <br>
+                <br>
+                <div class="banner_small_button">
+                    Not logged in
+                </div>  
+            {% else %}
+                <br>
+                <br>
+                <div class="banner_small_button">
+                    Logged in as: <a href="/account">{{ user }} </a>                    
+                </div>  
+            {% endif %}
+        </div>
+        <div class="banner_large">
+            <h1>
+                XMR Memes
+            </h1>
+            <h3>
+                Get tipped in XMR to make Monero memes!
+            </h3>
+        </div>
+        <div class="meme_holder">
+            <div class="meme" style="width: 450px;">
+                <img style="object-fit: contain;" src="../{{ meme['filename'] }}" height="450" width="450"></img>
+                <h2 style="color: #cf4e15;">{{ meme["title"] }}</h2>
+                <h2>By: {{ meme["author"] }}</h2>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <h2>
+                Tip the creator
+            </h2>
+            <h3>{{ tip_address }}</h3>
+            <p>This meme has received: {{ amount }} XMR</p>
+        </div>
+        <br>
+    </body>
+</html>

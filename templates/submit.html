@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="./static/style.css">
+    <title>Monero Memes</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.png">
+</head>
+<html>
+    <body>
+        <div class="banner_small">
+            <!-- <div class="banner_small_button"> -->
+                <!-- <img width="40" src="https://cryptologos.cc/logos/monero-xmr-logo.png"> -->
+            <!-- </div> -->
+            <div class="banner_small_button">
+                <a href="/">
+                    Home
+                </a>
+            </div>
+            <div class="banner_small_button">
+                <a href="/about">
+                    About
+                </a>
+            </div>
+            <div class="banner_small_button">
+                <a href="/leaderboard">
+                    Leaderboard
+                </a>
+            </div>
+            <div class="banner_small_button">
+                <a href="/submit">
+                    Submit
+                </a>
+            </div>  
+
+            {% if not user %}
+                <div class="banner_small_button">
+                    <a href="/login">
+                        Login
+                    </a>
+                </div>  
+                <div class="banner_small_button">
+                    <a href="/register">
+                        Register
+                    </a>
+                </div>  
+                <br>
+                <br>
+                <div class="banner_small_button">
+                    Not logged in
+                </div>  
+            {% else %}
+                <br>
+                <br>
+                <div class="banner_small_button">
+                    Logged in as: <a href="/account">{{ user }} </a>                    
+                </div>  
+            {% endif %}
+        </div>
+        <br>
+        <div class="register" style="padding-top: 0; padding-bottom: 0;">
+            <h2>Submit a meme</h2>
+        </div>  
+        <div class="register">
+            <form action="/submit_meme" method="POST" enctype="multipart/form-data">
+                <label for="fname">Title</label>
+                <input type="text" id="title" name="title" required>
+                <!-- <input type="file" id="file" name="filename"> -->
+                <output></output>
+                <br>
+                <input id="files" type="file" name="files" accept="image/jpeg, image/png, image/jpg">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </body>
+    <script>
+        const output = document.querySelector("output")
+        const input = document.getElementById("files")
+        let imagesArray = []
+
+        function deleteImage(index) {
+            imagesArray.splice(index, 1)
+            displayImages()
+        }
+
+        function displayImages() {
+            let images = ""
+            imagesArray.forEach((image, index) => {
+                images +=  `
+                        <div class="image">
+                            <img style="width:500px; height:500px; object-fit: contain; border-radius: 5px;" src="${URL.createObjectURL(image)}" alt="image">
+                            <span onclick="deleteImage(${index})">&times;</span>
+                        </div>
+                            `
+            })
+            output.innerHTML = images
+        }
+
+        console.log(input)
+        input.addEventListener("change", () => {
+            imagesArray = []
+            console.log("here")
+            const files = input.files
+            for (let i = 0; i < files.length; i++) {
+                imagesArray.push(files[i])
+            }
+            displayImages()
+        })
+    </script>
+</html>
