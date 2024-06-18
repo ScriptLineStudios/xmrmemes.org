@@ -2,7 +2,7 @@ body {
     margin: 0;
     background-color: #1b1d1e;
     color: white;
-    font-family: 'Courier New', monospace;
+    font-family: arial, sans-serif;
 }
 
 ::-webkit-scrollbar {
