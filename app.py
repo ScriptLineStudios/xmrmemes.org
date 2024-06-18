@@ -221,4 +221,4 @@ def register_account():
 
 if __name__ == "__main__":
     threading.Thread(target=update_tips, args=(db, lock, wallet)).start()
-    app.run(debug=False)
+    app.run(host="0.0.0.0", debug=False)
