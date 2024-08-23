@@ -201,6 +201,10 @@ def register_account():
         flash("Password must be at least 8 characters!")
         return redirect(url_for("register"))
 
+    if re.findall(r"[\s]", display_name) == []:
+        flash("Display names cannot contain spaces!")
+        return redirect(url_for("register"))
+
     if not re.match("^(?:[48][0-9AB]|4[1-9A-HJ-NP-Za-km-z]{12}(?:[1-9A-HJ-NP-Za-km-z]{30})?)[1-9A-HJ-NP-Za-km-z]{93}$", address):
         flash("Not a valid XMR address!")
         return redirect(url_for("register"))
